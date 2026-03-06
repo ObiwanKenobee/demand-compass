@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Code2, Microscope, Leaf, BookMarked } from "lucide-react";
 import { Line, LineChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useDashboard } from "@/contexts/DashboardContext";
+import { useCommunityMembers as useLiveCommunity } from "@/hooks/use-dashboard-data";
 import { getCommunityData, getCommunityTotals } from "@/lib/dashboard-data";
 import { useState } from "react";
 import DrillDownModal from "./DrillDownModal";
@@ -16,22 +17,24 @@ const iconConfigs = [
 
 const CommunityGrowth = () => {
   const { period } = useDashboard();
-  const data = getCommunityData(period);
-  const totals = getCommunityTotals(period);
+  const { data: liveCommunity, isLoading } = useLiveCommunity(period);
+  const hasLive = liveCommunity && liveCommunity.totals.some(t => t.value > 0);
+  const totals = hasLive ? liveCommunity.totals : getCommunityTotals(period);
+  const chartData = getCommunityData(period); // Always use mock for chart trend (need historical)
   const [drillDown, setDrillDown] = useState(false);
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.7 }}
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.7 }}
         className="rounded-xl border border-border bg-card p-6 cursor-pointer hover:border-primary/30 transition-colors"
         onClick={() => setDrillDown(true)}
       >
         <div className="flex items-center gap-2 mb-1">
           <div className="w-2 h-2 rounded-full bg-success" />
-          <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Ecosystem</span>
+          <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
+            Ecosystem {hasLive && <span className="text-primary">● Live</span>}
+          </span>
         </div>
         <h3 className="text-lg font-display text-secondary-foreground mb-6">Community Growth</h3>
 
@@ -50,7 +53,7 @@ const CommunityGrowth = () => {
 
         <div className="h-28">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <LineChart data={chartData}>
               <Tooltip contentStyle={{ background: "hsl(220, 22%, 9%)", border: "1px solid hsl(220, 15%, 16%)", borderRadius: "8px", color: "hsl(200, 20%, 90%)", fontSize: "11px" }} />
               <Line type="monotone" dataKey="devs" stroke="hsl(174, 72%, 46%)" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="researchers" stroke="hsl(38, 90%, 58%)" strokeWidth={1.5} dot={false} />
@@ -62,28 +65,48 @@ const CommunityGrowth = () => {
       </motion.div>
 
       <DrillDownModal open={drillDown} onOpenChange={setDrillDown} title="Community Growth — Detail">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-muted-foreground">Month</TableHead>
-              <TableHead className="text-muted-foreground">Developers</TableHead>
-              <TableHead className="text-muted-foreground">Researchers</TableHead>
-              <TableHead className="text-muted-foreground">Orgs</TableHead>
-              <TableHead className="text-muted-foreground">Contributors</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow key={row.month}>
-                <TableCell className="text-foreground">{row.month}</TableCell>
-                <TableCell className="text-primary">{row.devs}</TableCell>
-                <TableCell className="text-accent">{row.researchers}</TableCell>
-                <TableCell className="text-success">{row.orgs}</TableCell>
-                <TableCell className="text-secondary-foreground">{row.contributors}</TableCell>
+        <div className="space-y-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-muted-foreground">Category</TableHead>
+                <TableHead className="text-muted-foreground">Count</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {totals.map((t, i) => (
+                <TableRow key={t.label}>
+                  <TableCell className="text-foreground">{t.label}</TableCell>
+                  <TableCell className="font-semibold" style={{ color: iconConfigs[i].color }}>{t.value}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {hasLive && liveCommunity.raw.length > 0 && (
+            <>
+              <h4 className="text-sm font-display text-secondary-foreground">Recent Members</h4>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-muted-foreground">Name</TableHead>
+                    <TableHead className="text-muted-foreground">Type</TableHead>
+                    <TableHead className="text-muted-foreground">Organization</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {liveCommunity.raw.slice(0, 10).map(m => (
+                    <TableRow key={m.id}>
+                      <TableCell className="text-foreground">{m.name || "—"}</TableCell>
+                      <TableCell className="text-primary capitalize">{m.member_type.replace("_", " ")}</TableCell>
+                      <TableCell className="text-muted-foreground">{m.organization || "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
+          )}
+        </div>
       </DrillDownModal>
     </>
   );

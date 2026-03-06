@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useDashboard } from "@/contexts/DashboardContext";
-import { getChannels, getDemandEngineDetails } from "@/lib/dashboard-data";
+import { useDemandEngine } from "@/hooks/use-dashboard-data";
+import { getChannels } from "@/lib/dashboard-data";
 import { useState } from "react";
 import DrillDownModal from "./DrillDownModal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,22 +9,24 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recha
 
 const DemandEnginePanel = () => {
   const { period } = useDashboard();
-  const channels = getChannels(period);
+  const { channels: liveChannels, isLoading } = useDemandEngine(period);
+  const hasLive = liveChannels.some(c => c.leads > 0);
+  const channels = hasLive ? liveChannels : getChannels(period);
   const maxLeads = Math.max(...channels.map((c) => c.leads), 1);
   const [drillDown, setDrillDown] = useState(false);
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
         className="rounded-xl border border-border bg-card p-6 cursor-pointer hover:border-primary/30 transition-colors"
         onClick={() => setDrillDown(true)}
       >
         <div className="flex items-center gap-2 mb-1">
           <div className="w-2 h-2 rounded-full bg-accent" />
-          <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Demand Engine</span>
+          <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
+            Demand Engine {hasLive && <span className="text-primary">● Live</span>}
+          </span>
         </div>
         <h3 className="text-lg font-display text-secondary-foreground mb-6">Institutional Lead Sources</h3>
 
@@ -35,8 +38,8 @@ const DemandEnginePanel = () => {
                 <span className="text-xs text-muted-foreground">{ch.qualified}/{ch.leads} qualified ({ch.pct}%)</span>
               </div>
               <div className="relative h-3 rounded-full bg-muted overflow-hidden">
-                <motion.div key={`t-${period}`} initial={{ width: 0 }} animate={{ width: `${(ch.leads / maxLeads) * 100}%` }} transition={{ duration: 0.8 }} className="absolute inset-y-0 left-0 rounded-full bg-secondary" />
-                <motion.div key={`q-${period}`} initial={{ width: 0 }} animate={{ width: `${(ch.qualified / maxLeads) * 100}%` }} transition={{ duration: 0.8, delay: 0.1 }} className="absolute inset-y-0 left-0 rounded-full bg-primary/80" />
+                <motion.div key={`t-${period}-${ch.leads}`} initial={{ width: 0 }} animate={{ width: `${(ch.leads / maxLeads) * 100}%` }} transition={{ duration: 0.8 }} className="absolute inset-y-0 left-0 rounded-full bg-secondary" />
+                <motion.div key={`q-${period}-${ch.qualified}`} initial={{ width: 0 }} animate={{ width: `${(ch.qualified / maxLeads) * 100}%` }} transition={{ duration: 0.8, delay: 0.1 }} className="absolute inset-y-0 left-0 rounded-full bg-primary/80" />
               </div>
             </motion.div>
           ))}
@@ -61,18 +64,17 @@ const DemandEnginePanel = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="text-muted-foreground">Channel</TableHead>
-                <TableHead className="text-muted-foreground">Total Leads</TableHead>
+                <TableHead className="text-muted-foreground">Total</TableHead>
                 <TableHead className="text-muted-foreground">Qualified</TableHead>
-                <TableHead className="text-muted-foreground">Conv. Rate</TableHead>
+                <TableHead className="text-muted-foreground">Conv.</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {getDemandEngineDetails(period).map((ch) => (
+              {channels.map((ch) => (
                 <TableRow key={ch.name}>
                   <TableCell className="text-foreground">{ch.name}</TableCell>
                   <TableCell className="text-secondary-foreground">{ch.leads}</TableCell>

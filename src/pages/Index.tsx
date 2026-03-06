@@ -8,10 +8,17 @@ import CommunityGrowth from "@/components/dashboard/CommunityGrowth";
 import StrategicSignalsFeed from "@/components/dashboard/StrategicSignalsFeed";
 import TimePeriodFilter from "@/components/dashboard/TimePeriodFilter";
 import { DashboardProvider } from "@/contexts/DashboardContext";
+import { useRealtimeSubscriptions } from "@/hooks/use-dashboard-data";
+
+const DashboardContent = () => {
+  useRealtimeSubscriptions();
+  return null;
+};
 
 const Index = () => {
   return (
     <DashboardProvider>
+      <DashboardContent />
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}

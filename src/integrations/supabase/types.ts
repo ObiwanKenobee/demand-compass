@@ -14,7 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      community_members: {
+        Row: {
+          id: string
+          joined_at: string
+          member_type: string
+          name: string | null
+          organization: string | null
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          member_type: string
+          name?: string | null
+          organization?: string | null
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          member_type?: string
+          name?: string | null
+          organization?: string | null
+        }
+        Relationships: []
+      }
+      institutional_leads: {
+        Row: {
+          contact_email: string | null
+          created_at: string
+          engagement_level: string | null
+          id: string
+          notes: string | null
+          organization_name: string
+          organization_type: string
+          region: string
+          source_channel: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          created_at?: string
+          engagement_level?: string | null
+          id?: string
+          notes?: string | null
+          organization_name: string
+          organization_type: string
+          region: string
+          source_channel: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          created_at?: string
+          engagement_level?: string | null
+          id?: string
+          notes?: string | null
+          organization_name?: string
+          organization_type?: string
+          region?: string
+          source_channel?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      narrative_metrics: {
+        Row: {
+          id: string
+          metric_type: string
+          recorded_at: string
+          source: string | null
+          title: string | null
+        }
+        Insert: {
+          id?: string
+          metric_type: string
+          recorded_at?: string
+          source?: string | null
+          title?: string | null
+        }
+        Update: {
+          id?: string
+          metric_type?: string
+          recorded_at?: string
+          source?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      strategic_signals: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          organization_name: string
+          signal_type: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          organization_name: string
+          signal_type: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          organization_name?: string
+          signal_type?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

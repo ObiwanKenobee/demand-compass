@@ -42,8 +42,9 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-3">
               <ExportButton />
-              <AdminPanel />
+              {isAdmin && <AdminPanel />}
               <TimePeriodFilter />
+              <ThemeToggle />
               <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
                 <LogOut className="w-4 h-4" />
               </Button>

@@ -90,6 +90,11 @@ const Auth = () => {
           <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
           </Button>
+          {isLogin && (
+            <p className="text-center text-sm">
+              <Link to="/forgot-password" className="text-primary hover:underline">Forgot password?</Link>
+            </p>
+          )}
           <p className="text-center text-sm text-muted-foreground">
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <button

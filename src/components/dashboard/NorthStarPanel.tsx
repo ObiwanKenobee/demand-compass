@@ -20,7 +20,9 @@ const NorthStarPanel = () => {
   const { period } = useDashboard();
   const { totalQIL, growthRate, trendData: liveTrend, isLoading, allLeads } = useNorthStarMetrics(period);
   const [drillDown, setDrillDown] = useState(false);
-  const { isAdmin } = useUserRole();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [regionFilter, setRegionFilter] = useState("all");
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

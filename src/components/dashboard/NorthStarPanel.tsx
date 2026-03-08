@@ -48,7 +48,8 @@ const NorthStarPanel = () => {
     });
   }, [qualifiedLeads, searchQuery, statusFilter, regionFilter]);
 
-  const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(filteredLeads, 10);
+  const { sorted: sortedLeads, sortKey, sortDir, toggle } = useSort(filteredLeads);
+  const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(sortedLeads, 10);
 
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;

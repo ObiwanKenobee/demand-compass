@@ -6,6 +6,8 @@ import { useNorthStarMetrics } from "@/hooks/use-dashboard-data";
 import { scaleValue, scaleGrowth } from "@/lib/dashboard-data";
 import { useMemo, useState } from "react";
 import DrillDownModal from "./DrillDownModal";
+import TablePagination from "./TablePagination";
+import { usePagination } from "@/hooks/use-pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getNorthStarTrend as getMockTrend } from "@/lib/dashboard-data";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -43,6 +45,8 @@ const NorthStarPanel = () => {
       return matchesSearch && matchesStatus && matchesRegion;
     });
   }, [qualifiedLeads, searchQuery, statusFilter, regionFilter]);
+
+  const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(filteredLeads, 10);
 
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;
@@ -197,14 +201,14 @@ const NorthStarPanel = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredLeads.length === 0 ? (
+                  {paginatedLeads.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={isAdmin ? 5 : 4} className="text-center text-muted-foreground py-8">
                         No leads match your search
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredLeads.map(lead => (
+                    paginatedLeads.map(lead => (
                       <TableRow key={lead.id}>
                         <TableCell className="text-foreground">{lead.organization_name}</TableCell>
                         <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
@@ -222,6 +226,7 @@ const NorthStarPanel = () => {
                   )}
                 </TableBody>
               </Table>
+              <TablePagination page={page} totalPages={totalPages} totalItems={totalItems} startIndex={startIndex} endIndex={endIndex} onPageChange={setPage} />
             </>
           )}
 

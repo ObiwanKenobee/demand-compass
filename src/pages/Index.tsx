@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
+import NotificationBell from "@/components/dashboard/NotificationBell";
 
 const DashboardContent = () => {
   useRealtimeSubscriptions();
@@ -47,6 +48,7 @@ const Index = () => {
               {isAdmin && <AdminPanel />}
               <TimePeriodFilter />
               <ThemeToggle />
+              <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" title="Account">

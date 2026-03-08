@@ -236,8 +236,20 @@ const NorthStarPanel = () => {
                       <TableRow key={lead.id}>
                         <TableCell className="text-foreground">{lead.organization_name}</TableCell>
                         <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
-                        <TableCell className="text-primary capitalize">{lead.status}</TableCell>
-                        <TableCell className="text-muted-foreground">{lead.region}</TableCell>
+                        <TableCell className="text-primary">
+                          {isAdmin ? (
+                            <InlineSelect value={lead.status} options={statusOptions} onSave={(v) => handleUpdateLead(lead.id, "status", v)} className="text-primary" />
+                          ) : (
+                            <span className="capitalize">{lead.status}</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {isAdmin ? (
+                            <InlineSelect value={lead.region} options={regionOptions} onSave={(v) => handleUpdateLead(lead.id, "region", v)} />
+                          ) : (
+                            lead.region
+                          )}
+                        </TableCell>
                         {isAdmin && (
                           <TableCell>
                             <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteLead(lead.id)}>

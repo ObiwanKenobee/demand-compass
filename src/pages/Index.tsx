@@ -7,8 +7,12 @@ import ConversionFunnel from "@/components/dashboard/ConversionFunnel";
 import CommunityGrowth from "@/components/dashboard/CommunityGrowth";
 import StrategicSignalsFeed from "@/components/dashboard/StrategicSignalsFeed";
 import TimePeriodFilter from "@/components/dashboard/TimePeriodFilter";
+import AdminPanel from "@/components/dashboard/AdminPanel";
 import { DashboardProvider } from "@/contexts/DashboardContext";
 import { useRealtimeSubscriptions } from "@/hooks/use-dashboard-data";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 const DashboardContent = () => {
   useRealtimeSubscriptions();
@@ -16,6 +20,8 @@ const DashboardContent = () => {
 };
 
 const Index = () => {
+  const { user, signOut } = useAuth();
+
   return (
     <DashboardProvider>
       <DashboardContent />
@@ -31,7 +37,13 @@ const Index = () => {
                 Institutional Demand Radar — Is the idea spreading among the institutions that matter?
               </p>
             </div>
-            <TimePeriodFilter />
+            <div className="flex items-center gap-3">
+              <AdminPanel />
+              <TimePeriodFilter />
+              <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           {/* North Star */}

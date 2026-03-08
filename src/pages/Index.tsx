@@ -39,6 +39,7 @@ const Index = () => {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <ExportButton />
               <AdminPanel />
               <TimePeriodFilter />
               <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">

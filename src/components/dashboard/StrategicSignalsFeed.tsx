@@ -140,6 +140,19 @@ const StrategicSignalsFeed = () => {
               <SelectItem value="demo">Demo</SelectItem>
             </SelectContent>
           </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 shrink-0"
+            disabled={filteredSignals.length === 0}
+            onClick={() => {
+              const headers = ["title", "signal_type", "organization_name", "description", "created_at"];
+              const csv = toCsv(headers, filteredSignals);
+              downloadCsv(csv, `strategic_signals_${new Date().toISOString().slice(0, 10)}.csv`);
+            }}
+          >
+            <Download className="w-4 h-4" /> Export CSV
+          </Button>
         </div>
         <Table>
           <TableHeader>

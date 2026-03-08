@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { usePagination } from "@/hooks/use-pagination";
+import { useSort } from "@/hooks/use-sort";
 import TablePagination from "./TablePagination";
+import SortableHeader from "./SortableHeader";
 
 interface Signal {
   id: string;
@@ -21,17 +23,18 @@ interface SignalsTableProps {
 }
 
 const SignalsTable = ({ signals, isAdmin, isLive, onDelete }: SignalsTableProps) => {
-  const { page, setPage, totalPages, paginatedItems, totalItems, startIndex, endIndex } = usePagination(signals, 10);
+  const { sorted, sortKey, sortDir, toggle } = useSort(signals);
+  const { page, setPage, totalPages, paginatedItems, totalItems, startIndex, endIndex } = usePagination(sorted, 10);
 
   return (
     <>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-muted-foreground">Organization</TableHead>
-            <TableHead className="text-muted-foreground">Type</TableHead>
-            <TableHead className="text-muted-foreground">Description</TableHead>
-            <TableHead className="text-muted-foreground">When</TableHead>
+            <SortableHeader label="Organization" active={sortKey === "title"} direction={sortDir} onClick={() => toggle("title")} />
+            <SortableHeader label="Type" active={sortKey === "signal_type"} direction={sortDir} onClick={() => toggle("signal_type")} />
+            <SortableHeader label="Description" active={sortKey === "description"} direction={sortDir} onClick={() => toggle("description")} />
+            <SortableHeader label="When" active={sortKey === "created_at"} direction={sortDir} onClick={() => toggle("created_at")} />
             {isAdmin && isLive && <TableHead className="text-muted-foreground w-10" />}
           </TableRow>
         </TableHeader>

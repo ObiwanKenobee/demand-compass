@@ -3,6 +3,8 @@ import { Zap, Building2, GraduationCap, Globe, Shield, Trash2, Search } from "lu
 import { useStrategicSignals } from "@/hooks/use-dashboard-data";
 import { useMemo, useState } from "react";
 import DrillDownModal from "./DrillDownModal";
+import TablePagination from "./TablePagination";
+import { usePagination } from "@/hooks/use-pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
 import { useUserRole } from "@/hooks/use-user-role";

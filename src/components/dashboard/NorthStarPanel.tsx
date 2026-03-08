@@ -23,8 +23,24 @@ const NorthStarPanel = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [regionFilter, setRegionFilter] = useState("all");
+  const { isAdmin } = useUserRole();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const qualifiedLeads = allLeads.filter(l => ["qualified", "demo", "pilot", "contract"].includes(l.status));
+  
+  const uniqueRegions = useMemo(() => [...new Set(qualifiedLeads.map(l => l.region))].sort(), [qualifiedLeads]);
+
+  const filteredLeads = useMemo(() => {
+    return qualifiedLeads.filter((l) => {
+      const matchesSearch = !searchQuery ||
+        l.organization_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.organization_type.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || l.status === statusFilter;
+      const matchesRegion = regionFilter === "all" || l.region === regionFilter;
+      return matchesSearch && matchesStatus && matchesRegion;
+    });
+  }, [qualifiedLeads, searchQuery, statusFilter, regionFilter]);
 
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;

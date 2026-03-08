@@ -24,7 +24,7 @@ const DashboardContent = () => {
 
 const Index = () => {
   const { user, signOut } = useAuth();
-
+  const { isAdmin } = useUserRole();
   return (
     <DashboardProvider>
       <DashboardContent />

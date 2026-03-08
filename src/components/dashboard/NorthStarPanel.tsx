@@ -196,10 +196,10 @@ const NorthStarPanel = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-muted-foreground">Organization</TableHead>
-                    <TableHead className="text-muted-foreground">Type</TableHead>
-                    <TableHead className="text-muted-foreground">Status</TableHead>
-                    <TableHead className="text-muted-foreground">Region</TableHead>
+                    <SortableHeader label="Organization" active={sortKey === "organization_name"} direction={sortDir} onClick={() => toggle("organization_name")} />
+                    <SortableHeader label="Type" active={sortKey === "organization_type"} direction={sortDir} onClick={() => toggle("organization_type")} />
+                    <SortableHeader label="Status" active={sortKey === "status"} direction={sortDir} onClick={() => toggle("status")} />
+                    <SortableHeader label="Region" active={sortKey === "region"} direction={sortDir} onClick={() => toggle("region")} />
                     {isAdmin && <TableHead className="text-muted-foreground w-10" />}
                   </TableRow>
                 </TableHeader>

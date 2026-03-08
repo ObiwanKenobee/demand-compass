@@ -48,6 +48,7 @@ const Index = () => {
               {isAdmin && <AdminPanel />}
               <TimePeriodFilter />
               <ThemeToggle />
+              <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" title="Account">

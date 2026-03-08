@@ -52,6 +52,16 @@ const NorthStarPanel = () => {
   const { sorted: sortedLeads, sortKey, sortDir, toggle } = useSort(filteredLeads);
   const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(sortedLeads, 10);
 
+  const statusOptions = [
+    { value: "qualified", label: "Qualified" },
+    { value: "demo", label: "Demo" },
+    { value: "pilot", label: "Pilot" },
+    { value: "contract", label: "Contract" },
+    { value: "prospect", label: "Prospect" },
+  ];
+
+  const regionOptions = useMemo(() => uniqueRegions.map(r => ({ value: r, label: r })), [uniqueRegions]);
+
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;
     const { error } = await supabase.from("institutional_leads").delete().eq("id", id);
@@ -60,6 +70,16 @@ const NorthStarPanel = () => {
     } else {
       queryClient.invalidateQueries({ queryKey: ["institutional-leads"] });
       toast({ title: "Lead deleted" });
+    }
+  };
+
+  const handleUpdateLead = async (id: string, field: string, value: string) => {
+    const { error } = await supabase.from("institutional_leads").update({ [field]: value }).eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["institutional-leads"] });
+      toast({ title: "Lead updated" });
     }
   };
   // Use live data if available, fallback to mock

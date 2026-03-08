@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { TrendingUp, Trash2 } from "lucide-react";
+import { TrendingUp, Trash2, Search } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { useNorthStarMetrics } from "@/hooks/use-dashboard-data";
 import { scaleValue, scaleGrowth } from "@/lib/dashboard-data";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DrillDownModal from "./DrillDownModal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getNorthStarTrend as getMockTrend } from "@/lib/dashboard-data";
@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const NorthStarPanel = () => {
   const { period } = useDashboard();

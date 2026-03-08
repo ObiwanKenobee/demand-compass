@@ -9,9 +9,11 @@ import StrategicSignalsFeed from "@/components/dashboard/StrategicSignalsFeed";
 import TimePeriodFilter from "@/components/dashboard/TimePeriodFilter";
 import AdminPanel from "@/components/dashboard/AdminPanel";
 import ExportButton from "@/components/dashboard/ExportButton";
+import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import { DashboardProvider } from "@/contexts/DashboardContext";
 import { useRealtimeSubscriptions } from "@/hooks/use-dashboard-data";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/use-user-role";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 

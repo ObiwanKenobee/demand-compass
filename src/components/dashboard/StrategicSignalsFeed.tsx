@@ -1,10 +1,15 @@
 import { motion } from "framer-motion";
-import { Zap, Building2, GraduationCap, Globe, Shield } from "lucide-react";
+import { Zap, Building2, GraduationCap, Globe, Shield, Trash2 } from "lucide-react";
 import { useStrategicSignals } from "@/hooks/use-dashboard-data";
 import { useState } from "react";
 import DrillDownModal from "./DrillDownModal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
+import { useUserRole } from "@/hooks/use-user-role";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 const typeIcons: Record<string, typeof Building2> = {
   pilot: Building2,
@@ -22,7 +27,6 @@ const typeColors: Record<string, string> = {
   demo: "bg-accent/10 text-accent border-accent/20",
 };
 
-// Fallback data for when DB is empty
 const fallbackSignals = [
   { id: "1", organization_name: "UNDP Climate Adaptation Fund", signal_type: "pilot", title: "UNDP Climate Adaptation Fund", description: "Requested pilot program for regenerative asset verification in East Africa", created_at: new Date(Date.now() - 2 * 3600000).toISOString() },
   { id: "2", organization_name: "German Federal Ministry", signal_type: "inquiry", title: "German Federal Ministry", description: "Inquiry into policy simulation capabilities for carbon market design", created_at: new Date(Date.now() - 6 * 3600000).toISOString() },
@@ -35,6 +39,21 @@ const StrategicSignalsFeed = () => {
   const { data: dbSignals } = useStrategicSignals();
   const signals = dbSignals && dbSignals.length > 0 ? dbSignals : fallbackSignals;
   const [drillDown, setDrillDown] = useState(false);
+  const { isAdmin } = useUserRole();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("Delete this signal?")) return;
+    const { error } = await supabase.from("strategic_signals").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["strategic-signals"] });
+      toast({ title: "Signal deleted" });
+    }
+  };
 
   return (
     <>
@@ -89,6 +108,7 @@ const StrategicSignalsFeed = () => {
               <TableHead className="text-muted-foreground">Type</TableHead>
               <TableHead className="text-muted-foreground">Description</TableHead>
               <TableHead className="text-muted-foreground">When</TableHead>
+              {isAdmin && <TableHead className="text-muted-foreground w-10" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -98,6 +118,13 @@ const StrategicSignalsFeed = () => {
                 <TableCell className="text-accent capitalize">{s.signal_type}</TableCell>
                 <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{s.description}</TableCell>
                 <TableCell className="text-muted-foreground text-xs">{formatDistanceToNow(new Date(s.created_at), { addSuffix: true })}</TableCell>
+                {isAdmin && dbSignals && dbSignals.length > 0 && (
+                  <TableCell>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => handleDelete(s.id, e)}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

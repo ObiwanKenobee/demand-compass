@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download } from "lucide-react";
 import { toCsv, downloadCsv } from "@/lib/csv-utils";
+import InlineSelect from "./InlineSelect";
 
 const NorthStarPanel = () => {
   const { period } = useDashboard();

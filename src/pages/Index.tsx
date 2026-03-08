@@ -70,6 +70,7 @@ const Index = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            </div>
           </div>
 
           {/* North Star */}

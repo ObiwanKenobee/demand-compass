@@ -201,14 +201,14 @@ const NorthStarPanel = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredLeads.length === 0 ? (
+                  {paginatedLeads.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={isAdmin ? 5 : 4} className="text-center text-muted-foreground py-8">
                         No leads match your search
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredLeads.map(lead => (
+                    paginatedLeads.map(lead => (
                       <TableRow key={lead.id}>
                         <TableCell className="text-foreground">{lead.organization_name}</TableCell>
                         <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
@@ -226,6 +226,7 @@ const NorthStarPanel = () => {
                   )}
                 </TableBody>
               </Table>
+              <TablePagination page={page} totalPages={totalPages} totalItems={totalItems} startIndex={startIndex} endIndex={endIndex} onPageChange={setPage} />
             </>
           )}
 

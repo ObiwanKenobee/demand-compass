@@ -78,10 +78,10 @@ const AdminManagement = () => {
         return;
       }
 
-      const { error } = await supabase.from("user_roles").insert({
+      const { error } = await supabase.from("user_roles" as any).insert({
         user_id: profile.id,
         role: newRole,
-      });
+      } as any);
       if (error) {
         if (error.code === "23505") {
           toast({ title: "Already assigned", description: "This user already has this role.", variant: "destructive" });

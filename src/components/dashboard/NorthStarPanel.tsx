@@ -18,7 +18,20 @@ const NorthStarPanel = () => {
   const { period } = useDashboard();
   const { totalQIL, growthRate, trendData: liveTrend, isLoading, allLeads } = useNorthStarMetrics(period);
   const [drillDown, setDrillDown] = useState(false);
+  const { isAdmin } = useUserRole();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
+  const handleDeleteLead = async (id: string) => {
+    if (!confirm("Delete this lead?")) return;
+    const { error } = await supabase.from("institutional_leads").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["institutional-leads"] });
+      toast({ title: "Lead deleted" });
+    }
+  };
   // Use live data if available, fallback to mock
   const hasLiveData = allLeads.length > 0;
   const displayValue = hasLiveData ? totalQIL : scaleValue(74, period);

@@ -7,7 +7,9 @@ import { scaleValue, scaleGrowth } from "@/lib/dashboard-data";
 import { useMemo, useState } from "react";
 import DrillDownModal from "./DrillDownModal";
 import TablePagination from "./TablePagination";
+import SortableHeader from "./SortableHeader";
 import { usePagination } from "@/hooks/use-pagination";
+import { useSort } from "@/hooks/use-sort";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getNorthStarTrend as getMockTrend } from "@/lib/dashboard-data";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -46,7 +48,8 @@ const NorthStarPanel = () => {
     });
   }, [qualifiedLeads, searchQuery, statusFilter, regionFilter]);
 
-  const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(filteredLeads, 10);
+  const { sorted: sortedLeads, sortKey, sortDir, toggle } = useSort(filteredLeads);
+  const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(sortedLeads, 10);
 
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;
@@ -193,10 +196,10 @@ const NorthStarPanel = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-muted-foreground">Organization</TableHead>
-                    <TableHead className="text-muted-foreground">Type</TableHead>
-                    <TableHead className="text-muted-foreground">Status</TableHead>
-                    <TableHead className="text-muted-foreground">Region</TableHead>
+                    <SortableHeader label="Organization" active={sortKey === "organization_name"} direction={sortDir} onClick={() => toggle("organization_name")} />
+                    <SortableHeader label="Type" active={sortKey === "organization_type"} direction={sortDir} onClick={() => toggle("organization_type")} />
+                    <SortableHeader label="Status" active={sortKey === "status"} direction={sortDir} onClick={() => toggle("status")} />
+                    <SortableHeader label="Region" active={sortKey === "region"} direction={sortDir} onClick={() => toggle("region")} />
                     {isAdmin && <TableHead className="text-muted-foreground w-10" />}
                   </TableRow>
                 </TableHeader>

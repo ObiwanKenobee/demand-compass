@@ -136,34 +136,78 @@ const NorthStarPanel = () => {
           </div>
 
           {hasLiveData && (
-            <Table>
-              <TableHeader>
-               <TableRow>
-                  <TableHead className="text-muted-foreground">Organization</TableHead>
-                  <TableHead className="text-muted-foreground">Type</TableHead>
-                  <TableHead className="text-muted-foreground">Status</TableHead>
-                  <TableHead className="text-muted-foreground">Region</TableHead>
-                  {isAdmin && <TableHead className="text-muted-foreground w-10" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allLeads.filter(l => ["qualified", "demo", "pilot", "contract"].includes(l.status)).map(lead => (
-                  <TableRow key={lead.id}>
-                    <TableCell className="text-foreground">{lead.organization_name}</TableCell>
-                    <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
-                    <TableCell className="text-primary capitalize">{lead.status}</TableCell>
-                    <TableCell className="text-muted-foreground">{lead.region}</TableCell>
-                    {isAdmin && (
-                      <TableCell>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteLead(lead.id)}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </TableCell>
-                    )}
+            <>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search leads..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 bg-muted/30 border-border"
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-[140px] bg-muted/30 border-border">
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="qualified">Qualified</SelectItem>
+                    <SelectItem value="demo">Demo</SelectItem>
+                    <SelectItem value="pilot">Pilot</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={regionFilter} onValueChange={setRegionFilter}>
+                  <SelectTrigger className="w-full sm:w-[140px] bg-muted/30 border-border">
+                    <SelectValue placeholder="All regions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All regions</SelectItem>
+                    {uniqueRegions.map(r => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-muted-foreground">Organization</TableHead>
+                    <TableHead className="text-muted-foreground">Type</TableHead>
+                    <TableHead className="text-muted-foreground">Status</TableHead>
+                    <TableHead className="text-muted-foreground">Region</TableHead>
+                    {isAdmin && <TableHead className="text-muted-foreground w-10" />}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredLeads.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={isAdmin ? 5 : 4} className="text-center text-muted-foreground py-8">
+                        No leads match your search
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredLeads.map(lead => (
+                      <TableRow key={lead.id}>
+                        <TableCell className="text-foreground">{lead.organization_name}</TableCell>
+                        <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
+                        <TableCell className="text-primary capitalize">{lead.status}</TableCell>
+                        <TableCell className="text-muted-foreground">{lead.region}</TableCell>
+                        {isAdmin && (
+                          <TableCell>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteLead(lead.id)}>
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </>
           )}
 
           {!hasLiveData && (

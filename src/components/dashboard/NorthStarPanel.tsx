@@ -118,11 +118,12 @@ const NorthStarPanel = () => {
           {hasLiveData && (
             <Table>
               <TableHeader>
-                <TableRow>
+               <TableRow>
                   <TableHead className="text-muted-foreground">Organization</TableHead>
                   <TableHead className="text-muted-foreground">Type</TableHead>
                   <TableHead className="text-muted-foreground">Status</TableHead>
                   <TableHead className="text-muted-foreground">Region</TableHead>
+                  {isAdmin && <TableHead className="text-muted-foreground w-10" />}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -132,6 +133,13 @@ const NorthStarPanel = () => {
                     <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
                     <TableCell className="text-primary capitalize">{lead.status}</TableCell>
                     <TableCell className="text-muted-foreground">{lead.region}</TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteLead(lead.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

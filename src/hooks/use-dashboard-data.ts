@@ -267,14 +267,26 @@ export function useRealtimeSubscriptions() {
     const channels = [
       supabase
         .channel("leads-realtime")
-        .on("postgres_changes", { event: "*", schema: "public", table: "institutional_leads" }, () => {
+        .on("postgres_changes", { event: "*", schema: "public", table: "institutional_leads" }, (payload) => {
           queryClient.invalidateQueries({ queryKey: ["institutional-leads"] });
+          if (payload.eventType === "INSERT") {
+            const record = payload.new as { organization_name?: string; status?: string };
+            toast.info("New Institutional Lead", {
+              description: `${record.organization_name ?? "Unknown"} — ${record.status ?? "prospect"}`,
+            });
+          }
         })
         .subscribe(),
       supabase
         .channel("signals-realtime")
-        .on("postgres_changes", { event: "*", schema: "public", table: "strategic_signals" }, () => {
+        .on("postgres_changes", { event: "*", schema: "public", table: "strategic_signals" }, (payload) => {
           queryClient.invalidateQueries({ queryKey: ["strategic-signals"] });
+          if (payload.eventType === "INSERT") {
+            const record = payload.new as { title?: string; signal_type?: string };
+            toast.info("New Strategic Signal", {
+              description: `${record.title ?? "Signal"} (${record.signal_type ?? "unknown"})`,
+            });
+          }
         })
         .subscribe(),
       supabase

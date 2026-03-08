@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download } from "lucide-react";
 import { toCsv, downloadCsv } from "@/lib/csv-utils";
+import InlineSelect from "./InlineSelect";
 
 const NorthStarPanel = () => {
   const { period } = useDashboard();
@@ -51,6 +52,16 @@ const NorthStarPanel = () => {
   const { sorted: sortedLeads, sortKey, sortDir, toggle } = useSort(filteredLeads);
   const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(sortedLeads, 10);
 
+  const statusOptions = [
+    { value: "qualified", label: "Qualified" },
+    { value: "demo", label: "Demo" },
+    { value: "pilot", label: "Pilot" },
+    { value: "contract", label: "Contract" },
+    { value: "prospect", label: "Prospect" },
+  ];
+
+  const regionOptions = useMemo(() => uniqueRegions.map(r => ({ value: r, label: r })), [uniqueRegions]);
+
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;
     const { error } = await supabase.from("institutional_leads").delete().eq("id", id);
@@ -59,6 +70,16 @@ const NorthStarPanel = () => {
     } else {
       queryClient.invalidateQueries({ queryKey: ["institutional-leads"] });
       toast({ title: "Lead deleted" });
+    }
+  };
+
+  const handleUpdateLead = async (id: string, field: string, value: string) => {
+    const { error } = await supabase.from("institutional_leads").update({ [field]: value }).eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["institutional-leads"] });
+      toast({ title: "Lead updated" });
     }
   };
   // Use live data if available, fallback to mock
@@ -215,8 +236,20 @@ const NorthStarPanel = () => {
                       <TableRow key={lead.id}>
                         <TableCell className="text-foreground">{lead.organization_name}</TableCell>
                         <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
-                        <TableCell className="text-primary capitalize">{lead.status}</TableCell>
-                        <TableCell className="text-muted-foreground">{lead.region}</TableCell>
+                        <TableCell className="text-primary">
+                          {isAdmin ? (
+                            <InlineSelect value={lead.status} options={statusOptions} onSave={(v) => handleUpdateLead(lead.id, "status", v)} className="text-primary" />
+                          ) : (
+                            <span className="capitalize">{lead.status}</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {isAdmin ? (
+                            <InlineSelect value={lead.region} options={regionOptions} onSave={(v) => handleUpdateLead(lead.id, "region", v)} />
+                          ) : (
+                            lead.region
+                          )}
+                        </TableCell>
                         {isAdmin && (
                           <TableCell>
                             <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteLead(lead.id)}>

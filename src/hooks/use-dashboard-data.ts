@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TimePeriod } from "@/contexts/DashboardContext";
 import { subDays, subMonths, format, startOfMonth, parseISO } from "date-fns";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 function getDateFilter(period: TimePeriod): string {
   const now = new Date();

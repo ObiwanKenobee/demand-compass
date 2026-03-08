@@ -22,7 +22,7 @@ const ExportButton = () => {
       }
       const headers = Object.keys(data[0]);
       const csv = toCsv(headers, data);
-      downloadFile(csv, `${table}_${new Date().toISOString().slice(0, 10)}.csv`);
+      downloadCsv(csv, `${table}_${new Date().toISOString().slice(0, 10)}.csv`);
       toast({ title: "Exported", description: `${data.length} records downloaded.` });
     } catch (err: any) {
       toast({ title: "Export failed", description: err.message, variant: "destructive" });

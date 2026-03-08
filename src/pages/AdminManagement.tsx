@@ -31,14 +31,12 @@ const AdminManagement = () => {
   const { data: usersWithRoles = [], isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      // Get all roles (admin can see all via RLS policy)
       const { data: roles, error: rolesError } = await supabase
         .from("user_roles" as any)
-        .select("id, user_id, role");
+        .select("id, user_id, role") as { data: any[] | null; error: any };
       if (rolesError) throw rolesError;
 
-      // Get profiles for those users
-      const userIds = [...new Set(roles?.map((r) => r.user_id) || [])];
+      const userIds = [...new Set((roles || []).map((r: any) => r.user_id))];
       if (userIds.length === 0) return [];
 
       const { data: profiles } = await supabase
@@ -46,9 +44,9 @@ const AdminManagement = () => {
         .select("id, display_name")
         .in("id", userIds);
 
-      const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
+      const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-      return (roles || []).map((r) => ({
+      return (roles || []).map((r: any) => ({
         user_id: r.user_id,
         email: profileMap.get(r.user_id)?.display_name || r.user_id.slice(0, 8),
         display_name: profileMap.get(r.user_id)?.display_name || null,

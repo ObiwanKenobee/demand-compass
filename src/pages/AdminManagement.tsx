@@ -33,7 +33,7 @@ const AdminManagement = () => {
     queryFn: async () => {
       // Get all roles (admin can see all via RLS policy)
       const { data: roles, error: rolesError } = await supabase
-        .from("user_roles")
+        .from("user_roles" as any)
         .select("id, user_id, role");
       if (rolesError) throw rolesError;
 

@@ -41,9 +41,21 @@ const StrategicSignalsFeed = () => {
   const { data: dbSignals } = useStrategicSignals();
   const signals = dbSignals && dbSignals.length > 0 ? dbSignals : fallbackSignals;
   const [drillDown, setDrillDown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
   const { isAdmin } = useUserRole();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const filteredSignals = useMemo(() => {
+    return signals.filter((s) => {
+      const matchesSearch = !searchQuery || 
+        s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (s.description?.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesType = typeFilter === "all" || s.signal_type === typeFilter;
+      return matchesSearch && matchesType;
+    });
+  }, [signals, searchQuery, typeFilter]);
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

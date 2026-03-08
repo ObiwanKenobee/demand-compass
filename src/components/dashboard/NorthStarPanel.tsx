@@ -46,6 +46,8 @@ const NorthStarPanel = () => {
     });
   }, [qualifiedLeads, searchQuery, statusFilter, regionFilter]);
 
+  const { page, setPage, totalPages, paginatedItems: paginatedLeads, totalItems, startIndex, endIndex } = usePagination(filteredLeads, 10);
+
   const handleDeleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;
     const { error } = await supabase.from("institutional_leads").delete().eq("id", id);

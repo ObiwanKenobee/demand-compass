@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { Zap, Building2, GraduationCap, Globe, Shield, Trash2 } from "lucide-react";
+import { Zap, Building2, GraduationCap, Globe, Shield, Trash2, Search } from "lucide-react";
 import { useStrategicSignals } from "@/hooks/use-dashboard-data";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DrillDownModal from "./DrillDownModal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const typeIcons: Record<string, typeof Building2> = {
   pilot: Building2,
@@ -39,9 +41,21 @@ const StrategicSignalsFeed = () => {
   const { data: dbSignals } = useStrategicSignals();
   const signals = dbSignals && dbSignals.length > 0 ? dbSignals : fallbackSignals;
   const [drillDown, setDrillDown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
   const { isAdmin } = useUserRole();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const filteredSignals = useMemo(() => {
+    return signals.filter((s) => {
+      const matchesSearch = !searchQuery || 
+        s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (s.description?.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesType = typeFilter === "all" || s.signal_type === typeFilter;
+      return matchesSearch && matchesType;
+    });
+  }, [signals, searchQuery, typeFilter]);
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -101,6 +115,30 @@ const StrategicSignalsFeed = () => {
       </motion.div>
 
       <DrillDownModal open={drillDown} onOpenChange={setDrillDown} title="Strategic Signals — Full Feed">
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search signals..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 bg-muted/30 border-border"
+            />
+          </div>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-full sm:w-[160px] bg-muted/30 border-border">
+              <SelectValue placeholder="All types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="pilot">Pilot</SelectItem>
+              <SelectItem value="inquiry">Inquiry</SelectItem>
+              <SelectItem value="collaboration">Collaboration</SelectItem>
+              <SelectItem value="enterprise">Enterprise</SelectItem>
+              <SelectItem value="demo">Demo</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -112,21 +150,29 @@ const StrategicSignalsFeed = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {signals.map((s) => (
-              <TableRow key={s.id}>
-                <TableCell className="text-foreground font-medium">{s.title}</TableCell>
-                <TableCell className="text-accent capitalize">{s.signal_type}</TableCell>
-                <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{s.description}</TableCell>
-                <TableCell className="text-muted-foreground text-xs">{formatDistanceToNow(new Date(s.created_at), { addSuffix: true })}</TableCell>
-                {isAdmin && dbSignals && dbSignals.length > 0 && (
-                  <TableCell>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => handleDelete(s.id, e)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </TableCell>
-                )}
+            {filteredSignals.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={isAdmin ? 5 : 4} className="text-center text-muted-foreground py-8">
+                  No signals match your search
+                </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredSignals.map((s) => (
+                <TableRow key={s.id}>
+                  <TableCell className="text-foreground font-medium">{s.title}</TableCell>
+                  <TableCell className="text-accent capitalize">{s.signal_type}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{s.description}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs">{formatDistanceToNow(new Date(s.created_at), { addSuffix: true })}</TableCell>
+                  {isAdmin && dbSignals && dbSignals.length > 0 && (
+                    <TableCell>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => handleDelete(s.id, e)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </DrillDownModal>

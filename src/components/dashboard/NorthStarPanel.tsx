@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Trash2 } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { useNorthStarMetrics } from "@/hooks/use-dashboard-data";
@@ -8,12 +8,30 @@ import { useState } from "react";
 import DrillDownModal from "./DrillDownModal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getNorthStarTrend as getMockTrend } from "@/lib/dashboard-data";
+import { useUserRole } from "@/hooks/use-user-role";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 const NorthStarPanel = () => {
   const { period } = useDashboard();
   const { totalQIL, growthRate, trendData: liveTrend, isLoading, allLeads } = useNorthStarMetrics(period);
   const [drillDown, setDrillDown] = useState(false);
+  const { isAdmin } = useUserRole();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
+  const handleDeleteLead = async (id: string) => {
+    if (!confirm("Delete this lead?")) return;
+    const { error } = await supabase.from("institutional_leads").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["institutional-leads"] });
+      toast({ title: "Lead deleted" });
+    }
+  };
   // Use live data if available, fallback to mock
   const hasLiveData = allLeads.length > 0;
   const displayValue = hasLiveData ? totalQIL : scaleValue(74, period);
@@ -100,11 +118,12 @@ const NorthStarPanel = () => {
           {hasLiveData && (
             <Table>
               <TableHeader>
-                <TableRow>
+               <TableRow>
                   <TableHead className="text-muted-foreground">Organization</TableHead>
                   <TableHead className="text-muted-foreground">Type</TableHead>
                   <TableHead className="text-muted-foreground">Status</TableHead>
                   <TableHead className="text-muted-foreground">Region</TableHead>
+                  {isAdmin && <TableHead className="text-muted-foreground w-10" />}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -114,6 +133,13 @@ const NorthStarPanel = () => {
                     <TableCell className="text-muted-foreground capitalize">{lead.organization_type.replace("_", " ")}</TableCell>
                     <TableCell className="text-primary capitalize">{lead.status}</TableCell>
                     <TableCell className="text-muted-foreground">{lead.region}</TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteLead(lead.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

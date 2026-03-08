@@ -102,7 +102,7 @@ const AdminManagement = () => {
 
   const handleRemoveRole = async (roleId: string) => {
     try {
-      const { error } = await supabase.from("user_roles").delete().eq("id", roleId);
+      const { error } = await supabase.from("user_roles" as any).delete().eq("id", roleId);
       if (error) throw error;
       toast({ title: "Role removed" });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });

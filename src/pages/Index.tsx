@@ -15,7 +15,9 @@ import { useRealtimeSubscriptions } from "@/hooks/use-dashboard-data";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/use-user-role";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { LogOut, User, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const DashboardContent = () => {
   useRealtimeSubscriptions();

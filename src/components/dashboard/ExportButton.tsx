@@ -5,27 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-function toCsv(headers: string[], rows: Record<string, any>[]): string {
-  const escape = (v: any) => {
-    const s = v == null ? "" : String(v);
-    return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  const lines = [headers.join(",")];
-  for (const row of rows) {
-    lines.push(headers.map((h) => escape(row[h])).join(","));
-  }
-  return lines.join("\n");
-}
-
-function downloadFile(content: string, filename: string) {
-  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+import { toCsv, downloadCsv } from "@/lib/csv-utils";
 
 const ExportButton = () => {
   const [exporting, setExporting] = useState(false);
@@ -42,7 +22,7 @@ const ExportButton = () => {
       }
       const headers = Object.keys(data[0]);
       const csv = toCsv(headers, data);
-      downloadFile(csv, `${table}_${new Date().toISOString().slice(0, 10)}.csv`);
+      downloadCsv(csv, `${table}_${new Date().toISOString().slice(0, 10)}.csv`);
       toast({ title: "Exported", description: `${data.length} records downloaded.` });
     } catch (err: any) {
       toast({ title: "Export failed", description: err.message, variant: "destructive" });

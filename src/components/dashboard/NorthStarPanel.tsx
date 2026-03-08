@@ -15,6 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Download } from "lucide-react";
+import { toCsv, downloadCsv } from "@/lib/csv-utils";
 
 const NorthStarPanel = () => {
   const { period } = useDashboard();
@@ -137,7 +139,7 @@ const NorthStarPanel = () => {
 
           {hasLiveData && (
             <>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 items-end">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -170,6 +172,19 @@ const NorthStarPanel = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 shrink-0"
+                  disabled={filteredLeads.length === 0}
+                  onClick={() => {
+                    const headers = ["organization_name", "organization_type", "status", "region", "contact_email", "engagement_level", "created_at"];
+                    const csv = toCsv(headers, filteredLeads);
+                    downloadCsv(csv, `institutional_leads_${new Date().toISOString().slice(0, 10)}.csv`);
+                  }}
+                >
+                  <Download className="w-4 h-4" /> Export CSV
+                </Button>
               </div>
               <Table>
                 <TableHeader>

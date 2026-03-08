@@ -8,6 +8,7 @@ import CommunityGrowth from "@/components/dashboard/CommunityGrowth";
 import StrategicSignalsFeed from "@/components/dashboard/StrategicSignalsFeed";
 import TimePeriodFilter from "@/components/dashboard/TimePeriodFilter";
 import AdminPanel from "@/components/dashboard/AdminPanel";
+import ExportButton from "@/components/dashboard/ExportButton";
 import { DashboardProvider } from "@/contexts/DashboardContext";
 import { useRealtimeSubscriptions } from "@/hooks/use-dashboard-data";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +39,7 @@ const Index = () => {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <ExportButton />
               <AdminPanel />
               <TimePeriodFilter />
               <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">

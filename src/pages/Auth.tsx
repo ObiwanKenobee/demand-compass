@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Auth = () => {
@@ -90,6 +90,11 @@ const Auth = () => {
           <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
           </Button>
+          {isLogin && (
+            <p className="text-center text-sm">
+              <Link to="/forgot-password" className="text-primary hover:underline">Forgot password?</Link>
+            </p>
+          )}
           <p className="text-center text-sm text-muted-foreground">
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <button

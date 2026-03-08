@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { Zap, Building2, GraduationCap, Globe, Shield, Trash2 } from "lucide-react";
+import { Zap, Building2, GraduationCap, Globe, Shield, Trash2, Search } from "lucide-react";
 import { useStrategicSignals } from "@/hooks/use-dashboard-data";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DrillDownModal from "./DrillDownModal";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const typeIcons: Record<string, typeof Building2> = {
   pilot: Building2,

@@ -6,6 +6,8 @@ import { useNorthStarMetrics } from "@/hooks/use-dashboard-data";
 import { scaleValue, scaleGrowth } from "@/lib/dashboard-data";
 import { useMemo, useState } from "react";
 import DrillDownModal from "./DrillDownModal";
+import TablePagination from "./TablePagination";
+import { usePagination } from "@/hooks/use-pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getNorthStarTrend as getMockTrend } from "@/lib/dashboard-data";
 import { useUserRole } from "@/hooks/use-user-role";

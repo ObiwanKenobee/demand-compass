@@ -15,6 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Download } from "lucide-react";
+import { toCsv, downloadCsv } from "@/lib/csv-utils";
 
 const NorthStarPanel = () => {
   const { period } = useDashboard();

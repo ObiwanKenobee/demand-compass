@@ -156,42 +156,7 @@ const StrategicSignalsFeed = () => {
             <Download className="w-4 h-4" /> Export CSV
           </Button>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-muted-foreground">Organization</TableHead>
-              <TableHead className="text-muted-foreground">Type</TableHead>
-              <TableHead className="text-muted-foreground">Description</TableHead>
-              <TableHead className="text-muted-foreground">When</TableHead>
-              {isAdmin && <TableHead className="text-muted-foreground w-10" />}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredSignals.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={isAdmin ? 5 : 4} className="text-center text-muted-foreground py-8">
-                  No signals match your search
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredSignals.map((s) => (
-                <TableRow key={s.id}>
-                  <TableCell className="text-foreground font-medium">{s.title}</TableCell>
-                  <TableCell className="text-accent capitalize">{s.signal_type}</TableCell>
-                  <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{s.description}</TableCell>
-                  <TableCell className="text-muted-foreground text-xs">{formatDistanceToNow(new Date(s.created_at), { addSuffix: true })}</TableCell>
-                  {isAdmin && dbSignals && dbSignals.length > 0 && (
-                    <TableCell>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => handleDelete(s.id, e)}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <SignalsTable signals={filteredSignals} isAdmin={isAdmin} isLive={!!(dbSignals && dbSignals.length > 0)} onDelete={handleDelete} />
       </DrillDownModal>
     </>
   );
